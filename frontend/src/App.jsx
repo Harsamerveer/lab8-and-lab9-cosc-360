@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import Auth from './Auth';
 
 const App = () => {
+  console.log("App component rendered!"); // Checks if the main app loads
+
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [form, setForm] = useState({ name: '', description: '', category: '', price: '' });
   
-  const API_URL = 'http://localhost:5000/api';
+  const API_URL = 'http://localhost:5001/api';
 
   const fetchProducts = async () => {
+    console.log("Fetching all products...");
     const res = await fetch(`${API_URL}/products`);
     const data = await res.json();
+    console.log("Products retrieved:", data);
     setProducts(data);
   };
 
@@ -19,44 +24,58 @@ const App = () => {
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    console.log(`--- Searching for: "${searchQuery}" ---`);
     if (!searchQuery) return fetchProducts();
+    
     const res = await fetch(`${API_URL}/search?q=${searchQuery}`);
     const data = await res.json();
+    console.log("Search results:", data);
     setProducts(data);
   };
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    await fetch(`${API_URL}/products`, {
+    console.log("--- Creating new product ---", form);
+    const res = await fetch(`${API_URL}/products`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form)
     });
+    console.log("Create response status:", res.status);
+    
     setForm({ name: '', description: '', category: '', price: '' }); 
     fetchProducts(); 
   };
 
   const handleDelete = async (id) => {
-    await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
+    console.log(`--- Deleting product ID: ${id} ---`);
+    const res = await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
+    console.log("Delete response status:", res.status);
     fetchProducts();
   };
 
   const handleUpdate = async (id, oldPrice) => {
     const newPrice = prompt('Enter new price:', oldPrice);
-    if (!newPrice || isNaN(newPrice)) return;
+    if (!newPrice || isNaN(newPrice)) {
+      console.log("Update cancelled or invalid price entered.");
+      return;
+    }
     
-    await fetch(`${API_URL}/products/${id}`, {
+    console.log(`--- Updating product ID: ${id} to new price: ${newPrice} ---`);
+    const res = await fetch(`${API_URL}/products/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ price: Number(newPrice) })
     });
+    console.log("Update response status:", res.status);
     fetchProducts();
   };
 
   return (
+
     <div style={{ padding: '20px', fontFamily: 'Arial' }}>
       <h1>Product Inventory Manager</h1>
-      
+      <Auth />
       <form onSubmit={handleSearch} style={{ marginBottom: '20px' }}>
         <input 
           type="text" 
