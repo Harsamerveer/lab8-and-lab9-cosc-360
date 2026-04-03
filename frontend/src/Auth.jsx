@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
 const Auth = () => {
-  console.log("Auth component rendered!"); // Check if the component even loads
+  console.log("Auth component rendered!");
 
   const [isLogin, setIsLogin] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState(''); 
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(null); 
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
@@ -36,12 +36,12 @@ const Auth = () => {
           body: JSON.stringify({ email, password })
         });
       } else {
-        console.log("Preparing FormData for Sign Up with image...");
         const formData = new FormData();
         formData.append('email', email);
         formData.append('password', password);
+        
+        // Fix: Properly append the image if it exists
         if (image) {
-          console.log("Image attached:", image.name);
           formData.append('image', image);
         }
 
@@ -115,4 +115,4 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+export default Auth; 
